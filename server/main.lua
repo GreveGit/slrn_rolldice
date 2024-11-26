@@ -1,15 +1,15 @@
-lib.versionCheck('solareon/slrn_rolldice')
+local QBCore = exports['qb-core']:GetCoreObject()
 
-if not lib.checkDependency('qbx_core', '1.7.0') then error() end
-
+-- Ensure resource name is correct
 if GetCurrentResourceName() ~= 'slrn_rolldice' then
-    lib.print.error('The resource needs to be named ^slrn_rolldice^7.')
+    print('^1ERROR: The resource needs to be named slrn_rolldice.^0')
     return
 end
 
 local config = require 'config.shared'
 
-lib.callback.register('slrn_rolldice:server:getNote', function(source, randomType, noteString)
+-- Handle slip generation callback
+QBCore.Functions.CreateCallback('slrn_rolldice:server:getNote', function(source, cb, randomType, noteString)
     local metadata
     if randomType == 'roll' then
         metadata = {
@@ -22,9 +22,11 @@ lib.callback.register('slrn_rolldice:server:getNote', function(source, randomTyp
             diceRoll = string.sub(noteString, 7)
         }
     end
-    exports.ox_inventory:AddItem(source, 'stickynote', 1, metadata)
+    local success = exports.ox_inventory:AddItem(source, 'stickynote', 1, metadata)
+    cb(success)
 end)
 
+-- Handle random dice or coin flip events
 RegisterServerEvent('slrn_rolldice:server:random', function(sourceId, dices, sides)
     local callerLoc = GetEntityCoords(GetPlayerPed(sourceId))
     local tabler = {}
@@ -35,37 +37,33 @@ RegisterServerEvent('slrn_rolldice:server:random', function(sourceId, dices, sid
     TriggerClientEvent(event, -1, sourceId, tabler, sides, callerLoc)
 end)
 
+-- Register commands if enabled in the config
 if config.useCommand then
-    lib.addCommand(config.rollCommand, {
-        help = 'Roll a dice, a single six sided dice without options',
-        params = {
-            { name = 'sides', type = 'number', help = 'How many sides of dice - Max: '.. config.maxSides, optional = true},
-            { name = 'dice', type = 'number', help = 'How many dice to roll - Max: '.. config.maxDices, optional = true},
-        },
+    QBCore.Commands.Add(config.rollCommand, 'Roll a dice, a single six-sided dice without options', {
+        { name = 'sides', help = 'How many sides of dice - Max: ' .. config.maxSides, type = 'number', optional = true },
+        { name = 'dice', help = 'How many dice to roll - Max: ' .. config.maxDices, type = 'number', optional = true },
     }, function(source, args)
-        local dice, sides = args.dice or 1, args.sides or 6
+        local dice = args.dice or 1
+        local sides = args.sides or 6
         if (sides > 2 and sides <= config.maxSides) and (dice > 0 and dice <= config.maxDices) then
             TriggerEvent('slrn_rolldice:server:random', source, dice, sides)
         else
-            exports.qbx_core:Notify(source, 'Invalid amount. Try again')
+            TriggerClientEvent('QBCore:Notify', source, 'Invalid amount. Try again', 'error')
         end
     end)
-    lib.addCommand(config.flipCommand, {
-        help = 'Flip a coin, one flip without options',
-        params = {
-            { name = 'flips', type = 'number', help = 'How many coin flips - Max: '.. config.maxFlips, optional = true}
-        },
+
+    QBCore.Commands.Add(config.flipCommand, 'Flip a coin, one flip without options', {
+        { name = 'flips', help = 'How many coin flips - Max: ' .. config.maxFlips, type = 'number', optional = true }
     }, function(source, args)
         local flips = args.flips or 1
         if flips > 0 and flips <= config.maxFlips then
             TriggerEvent('slrn_rolldice:server:random', source, flips, 2)
         else
-            exports.qbx_core:Notify(source, 'Invalid amount. Try again')
+            TriggerClientEvent('QBCore:Notify', source, 'Invalid amount. Try again', 'error')
         end
     end)
-    lib.addCommand(config.slipsCommand, {
-        help = 'Toggle your slip recording'
-    }, function(source)
+
+    QBCore.Commands.Add(config.slipsCommand, 'Toggle your slip recording', {}, function(source)
         TriggerClientEvent('slrn_rolldice:client:toggleSlips', source)
     end)
 end

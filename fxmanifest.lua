@@ -1,10 +1,6 @@
 fx_version 'cerulean'
 game 'gta5'
-
-name 'slrn_rolldice'
-description 'A simple dice rolling script for Qbox'
-author 'solareon.'
-version '1.2.0'
+lua54 'yes'
 
 client_scripts {
     'client/main.lua',
@@ -12,16 +8,14 @@ client_scripts {
 
 shared_scripts {
     '@ox_lib/init.lua',
-    '@qbx_core/modules/lib.lua'
+    'config/shared.lua'
 }
 
 server_scripts {
     'server/main.lua',
 }
 
-files {
-    'config/shared.lua'
+dependencies {
+    'qb-core',
+    'ox_inventory'
 }
-
-lua54 'yes'
-use_experimental_fxv2_oal 'yes'
