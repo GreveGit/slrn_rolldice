@@ -1,5 +1,5 @@
 # slrn_rolldice
-A dice rolling and coin flip script for Qbox.
+A dice rolling and coin flip script for QBCore.
 
 # Options
 Simple config options for max dice / flips and if you want the player to get a note or not. commands can be changed to fit your server.
@@ -11,14 +11,11 @@ Simple config options for max dice / flips and if you want the player to get a n
 
 ```/slips```
 
-# Support
-- [Discord](https://discord.gg/TZFBBHvG6E)
-
 # Credits
- - [qbox-project](https://github.com/Qbox-project) for building an awesome fivem core
+ - [QBCore Framework](https://github.com/qbcore-framework) for building the framework!
  - [overextended](https://github.com/overextended) for ox_lib and ox_inventory which make stuff like this possible
 
 # Dependencies
-- [qbx_core](https://github.com/qbox-project/qbx_core) 1.7.0 or later
+- [qb-core](https://github.com/qbcore-framework/qb-core)
 - [ox_lib](https://github.com/overextended/ox_lib)
 - [ox_inventory](https://github.com/overextended/ox_inventory)
